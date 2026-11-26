@@ -1,0 +1,164 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080b18">
+<title>NEBULA X — AI Universe</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080b18;--panel:#11172a;--text:#f4f6ff;--muted:#9ba6c5;--blue:#6d8cff;--purple:#a66bff}
+body{background:var(--bg);color:var(--text);font-family:Arial,"Noto Sans",sans-serif;min-height:100vh;overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at 75% 20%,#452b8130,transparent 45%),radial-gradient(ellipse at 15% 55%,#245ac025,transparent 40%);z-index:-1}
+header{height:76px;display:flex;align-items:center;justify-content:space-between;padding:0 7%;border-bottom:1px solid #ffffff12;backdrop-filter:blur(16px)}
+.logo{font-size:23px;font-weight:800;letter-spacing:3px;background:linear-gradient(90deg,#79a7ff,#bd82ff);background-clip:text;color:transparent}
+nav{display:flex;align-items:center;gap:25px}
+nav a{color:var(--muted);text-decoration:none;font-size:14px}
+.lang{background:#171d32;border:1px solid #ffffff20;color:white;padding:9px 15px;border-radius:20px;cursor:pointer}
+.hero{text-align:center;padding:100px 20px 75px}
+.eyebrow{color:#9e9cff;letter-spacing:4px;font-size:12px;margin-bottom:25px}
+h1{font-size:clamp(44px,8vw,88px);line-height:1.08;letter-spacing:-3px}
+.gradient{background:linear-gradient(90deg,#77aaff,#bd83ff,#73d8ff);background-clip:text;color:transparent}
+.subtitle{color:var(--muted);font-size:17px;line-height:1.8;max-width:620px;margin:25px auto 30px}
+.cta{display:inline-block;padding:14px 28px;border-radius:30px;background:linear-gradient(100deg,#537fff,#985bff);color:white;text-decoration:none;font-weight:bold;box-shadow:0 8px 35px #705aff40}
+.orb{width:190px;height:190px;border-radius:50%;margin:65px auto 0;background:radial-gradient(circle at 35% 30%,#d3c4ff,#8669ed 23%,#343b9c 50%,#11172a 72%);box-shadow:0 0 60px #765bff66,0 0 130px #506dff30;animation:float 5s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-15px);box-shadow:0 0 85px #986bff88}}
+.section{padding:45px 7% 100px;max-width:1300px;margin:auto}
+.section-head{text-align:center;margin-bottom:40px}
+.section-head h2{font-size:32px;margin-bottom:12px}
+.section-head p{color:var(--muted)}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.card{background:linear-gradient(145deg,#151d34,#0d1222);border:1px solid #ffffff12;border-radius:20px;padding:27px;min-height:205px;transition:.25s}
+.card:hover{transform:translateY(-5px);border-color:#8b80ff88;box-shadow:0 15px 45px #0005}
+.icon{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;background:#667cff22;font-size:24px;margin-bottom:20px}
+.card h3{font-size:19px;margin-bottom:10px}
+.card p{font-size:14px;color:var(--muted);line-height:1.7}
+.card button{margin-top:17px;background:transparent;color:#aab7ff;border:1px solid #7888ff66;border-radius:20px;padding:8px 16px;cursor:pointer}
+footer{text-align:center;border-top:1px solid #ffffff12;padding:30px;color:#78839f;font-size:13px}
+@media(max-width:750px){
+header{height:65px;padding:0 5%}
+nav{gap:10px}nav a{display:none}
+.hero{padding:75px 20px 55px}
+h1{letter-spacing:-2px}
+.subtitle{font-size:15px}
+.orb{width:145px;height:145px;margin-top:48px}
+.section{padding:35px 5% 70px}
+.cards{grid-template-columns:1fr;gap:14px}
+.card{min-height:175px}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">NEBULA X</div>
+  <nav>
+    <a href="#home" data-zh="首页" data-ja="ホーム">首页</a>
+    <a href="#tools" data-zh="AI 工具" data-ja="AIツール">AI 工具</a>
+    <button class="lang" id="language">日本語</button>
+  </nav>
+</header>
+
+<main>
+<section class="hero" id="home">
+  <div class="eyebrow" id="eyebrow">WELCOME TO THE FUTURE</div>
+  <h1 id="headline">探索 AI 的<br><span class="gradient">无限宇宙</span></h1>
+  <p class="subtitle" id="subtitle">欢迎来到 NEBULA X。一个汇聚人工智能、创造力与未来科技的数字空间。</p>
+  <a class="cta" href="#tools" id="cta">探索 AI 工具 →</a>
+  <div class="orb"></div>
+</section>
+
+<section class="section" id="tools">
+  <div class="section-head">
+    <h2 id="tools-title">探索 AI 工具</h2>
+    <p id="tools-desc">让想象力成为现实</p>
+  </div>
+  <div class="cards">
+    <article class="card">
+      <div class="icon">✍️</div>
+      <h3 id="t1">AI 智能写作</h3>
+      <p id="d1">创作文章、文案与灵感，让表达更加简单。</p>
+      <button onclick="comingSoon()" id="b1">即将推出</button>
+    </article>
+    <article class="card">
+      <div class="icon">🎨</div>
+      <h3 id="t2">AI 图像创作</h3>
+      <p id="d2">将你的创意转化为独特的视觉作品。</p>
+      <button onclick="comingSoon()" id="b2">即将推出</button>
+    </article>
+    <article class="card">
+      <div class="icon">🌐</div>
+      <h3 id="t3">AI 智能翻译</h3>
+      <p id="d3">跨越语言障碍，让沟通更加自由。</p>
+      <button onclick="comingSoon()" id="b3">即将推出</button>
+    </article>
+    <article class="card">
+      <div class="icon">🤖</div>
+      <h3 id="t4">AI 助手</h3>
+      <p id="d4">随时提供灵感、知识与问题解答。</p>
+      <button onclick="comingSoon()" id="b4">即将推出</button>
+    </article>
+    <article class="card">
+      <div class="icon">⚡</div>
+      <h3 id="t5">效率中心</h3>
+      <p id="d5">用智能工具提升日常工作效率。</p>
+      <button onclick="comingSoon()" id="b5">即将推出</button>
+    </article>
+    <article class="card">
+      <div class="icon">🚀</div>
+      <h3 id="t6">更多功能</h3>
+      <p id="d6">探索 NEBULA X 即将开启的更多可能。</p>
+      <button onclick="comingSoon()" id="b6">即将推出</button>
+    </article>
+  </div>
+</section>
+</main>
+
+<footer>© 2026 NEBULA X · EXPLORE THE UNIVERSE OF AI</footer>
+
+<script>
+let japanese=false;
+const translations={
+eyebrow:"未来へようこそ",
+headline:'AIの<br><span class="gradient">無限の宇宙を探索</span>',
+subtitle:"NEBULA Xへようこそ。人工知能、創造性、未来のテクノロジーが集まるデジタル空間。",
+cta:"AIツールを探す →",
+"tools-title":"AIツールを探索",
+"tools-desc":"想像力を現実に",
+t1:"AIライティング",d1:"記事や文章、アイデアを簡単に作成。",
+t2:"AI画像生成",d2:"あなたのアイデアをビジュアル作品に。",
+t3:"AI翻訳",d3:"言語の壁を越えて自由にコミュニケーション。",
+t4:"AIアシスタント",d4:"アイデア、知識、質問への回答をサポート。",
+t5:"生産性センター",d5:"スマートツールで日々の作業を効率化。",
+t6:"その他の機能",d6:"NEBULA Xの新しい可能性を発見。",
+b1:"近日公開",b2:"近日公開",b3:"近日公開",
+b4:"近日公開",b5:"近日公開",b6:"近日公開"
+};
+const chinese={
+eyebrow:"WELCOME TO THE FUTURE",
+headline:'探索 AI 的<br><span class="gradient">无限宇宙</span>',
+subtitle:"欢迎来到 NEBULA X。一个汇聚人工智能、创造力与未来科技的数字空间。",
+cta:"探索 AI 工具 →",
+"tools-title":"探索 AI 工具","tools-desc":"让想象力成为现实",
+t1:"AI 智能写作",d1:"创作文章、文案与灵感，让表达更加简单。",
+t2:"AI 图像创作",d2:"将你的创意转化为独特的视觉作品。",
+t3:"AI 智能翻译",d3:"跨越语言障碍，让沟通更加自由。",
+t4:"AI 助手",d4:"随时提供灵感、知识与问题解答。",
+t5:"效率中心",d5:"用智能工具提升日常工作效率。",
+t6:"更多功能",d6:"探索 NEBULA X 即将开启的更多可能。",
+b1:"即将推出",b2:"即将推出",b3:"即将推出",
+b4:"即将推出",b5:"即将推出",b6:"即将推出"
+};
+document.getElementById("language").addEventListener("click",()=>{
+ japanese=!japanese;
+ const data=japanese?translations:chinese;
+ Object.keys(data).forEach(id=>document.getElementById(id).innerHTML=data[id]);
+ document.getElementById("language").textContent=japanese?"中文":"日本語";
+ document.documentElement.lang=japanese?"ja":"zh-CN";
+});
+function comingSoon(){
+ alert(japanese?"この機能は近日公開予定です。":"这个功能即将推出，敬请期待！");
+}
+</script>
+</body>
+</html>

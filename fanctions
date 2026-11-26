@@ -1,0 +1,133 @@
+
+export async function onRequestPost({ request, env }) {
+  const json = (data, status = 200) =>
+    new Response(JSON.stringify(data), {
+      status,
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+        "Cache-Control": "no-store"
+      }
+    });
+
+  try {
+    // 检查 AI 服务绑定
+    if (!env.AI) {
+      return json({
+        success: false,
+        error: "AI 服务尚未连接，请检查 Cloudflare Workers AI 绑定。"
+      }, 503);
+    }
+
+    // 读取用户消息
+    let body;
+
+    try {
+      body = await request.json();
+    } catch {
+      return json({
+        success: false,
+        error: "请求格式错误，请重新发送。"
+      }, 400);
+    }
+
+    if (!Array.isArray(body.messages)) {
+      return json({
+        success: false,
+        error: "消息格式不正确。"
+      }, 400);
+    }
+
+    // 过滤并限制消息内容
+    const messages = body.messages
+      .filter(message =>
+        message &&
+        ["user", "assistant"].includes(message.role) &&
+        typeof message.content === "string" &&
+        message.content.trim().length > 0
+      )
+      .slice(-12)
+      .map(message => ({
+        role: message.role,
+        content: message.content.trim().slice(0, 4000)
+      }));
+
+    if (
+      messages.length === 0 ||
+      messages[messages.length - 1].role !== "user"
+    ) {
+      return json({
+        success: false,
+        error: "请输入有效的问题。"
+      }, 400);
+    }
+
+    // 调用 Cloudflare Workers AI
+    const result = await env.AI.run(
+      "@cf/meta/llama-3.1-8b-instruct",
+      {
+        messages: [
+          {
+            role: "system",
+            content: `
+你是 NEBULA X 的官方 AI 助手。
+
+你的任务：
+1. 使用用户当前使用的语言回答。
+2. 支持中文、日语和英语。
+3. 回答清晰、准确、有帮助。
+4. 不确定的信息必须明确说明，不得编造。
+5. 代码问题尽量提供可执行的示例。
+6. 保持友好、专业、简洁。
+`
+          },
+          ...messages
+        ],
+        max_tokens: 1024
+      }
+    );
+
+    const reply = result?.response;
+
+    if (typeof reply !== "string" || !reply.trim()) {
+      return json({
+        success: false,
+        error: "AI 暂时没有生成回答，请重试。"
+      }, 502);
+    }
+
+    return json({
+      success: true,
+      reply: reply.trim()
+    });
+
+  } catch (error) {
+    // 详细错误只记录在服务器日志中
+    console.error("NEBULA X AI Error:", error);
+
+    return json({
+      success: false,
+      error: "AI 服务暂时不可用，请稍后重试。"
+    }, 500);
+  }
+}
+
+// 不允许其他请求方式
+export async function onRequest({ request, next }) {
+  if (request.method === "POST") {
+    return next();
+  }
+
+  return new Response(
+    JSON.stringify({
+      success: false,
+      error: "请使用 POST 请求。"
+    }),
+    {
+      status: 405,
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+        "Allow": "POST"
+      }
+    }
+  );
+}

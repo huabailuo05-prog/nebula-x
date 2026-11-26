@@ -1,0 +1,221 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080b18">
+<title>NEBULA X | AI Assistant</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;min-height:100vh;color:#eef2ff;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:
+    radial-gradient(ellipse at 20% 10%,#26336b66,transparent 45%),
+    radial-gradient(ellipse at 85% 75%,#552b8060,transparent 45%),
+    #080b18;
+}
+header{
+  height:70px;padding:0 5%;display:flex;align-items:center;
+  justify-content:space-between;border-bottom:1px solid #ffffff18;
+  backdrop-filter:blur(15px);
+}
+.logo{font-size:21px;font-weight:800;letter-spacing:3px}
+.logo span{color:#8da9ff}
+button,textarea{font:inherit}
+select{
+  background:#171d35;color:white;border:1px solid #414c72;
+  border-radius:10px;padding:9px;
+}
+main{
+  width:min(900px,94%);margin:35px auto;
+  height:calc(100dvh - 125px);min-height:450px;
+  display:flex;flex-direction:column;
+  background:#11182cbb;border:1px solid #ffffff20;
+  border-radius:22px;overflow:hidden;
+  box-shadow:0 20px 80px #0008;backdrop-filter:blur(18px);
+}
+.top{padding:22px;border-bottom:1px solid #ffffff16}
+.top h1{margin:0;font-size:23px}
+.top p{margin:8px 0 0;color:#aab6d8;font-size:13px}
+#messages{
+  flex:1;overflow-y:auto;padding:24px;
+  display:flex;flex-direction:column;gap:18px;
+}
+.message{
+  max-width:82%;padding:14px 17px;border-radius:16px;
+  line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere;
+}
+.bot{align-self:flex-start;background:#202b49;border:1px solid #ffffff12}
+.user{align-self:flex-end;background:linear-gradient(135deg,#465fc0,#7549a8)}
+#status{padding:0 24px;color:#aab6d8;font-size:12px;min-height:20px}
+.composer{
+  display:flex;gap:10px;padding:16px;
+  border-top:1px solid #ffffff18;background:#0d1426;
+}
+textarea{
+  flex:1;resize:none;max-height:130px;min-height:48px;
+  padding:14px;border-radius:13px;
+  color:white;background:#1a2340;border:1px solid #ffffff20;
+  outline:none;
+}
+textarea:focus{border-color:#819bff}
+#send{
+  border:0;border-radius:13px;padding:0 22px;
+  color:white;font-weight:700;cursor:pointer;
+  background:linear-gradient(135deg,#536fe0,#8952bd);
+}
+#send:disabled{opacity:.5;cursor:not-allowed}
+@media(max-width:600px){
+  header{height:60px;padding:0 16px}
+  .logo{font-size:17px}
+  main{
+    width:100%;height:calc(100dvh - 60px);
+    min-height:0;margin:0;border-radius:0;border:0;
+  }
+  .top{padding:17px}
+  #messages{padding:16px}
+  .message{max-width:90%;font-size:15px}
+  .composer{padding:11px}
+  #send{padding:0 16px}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">NEBULA <span>X</span></div>
+  <select id="language" aria-label="Language">
+    <option value="zh">简体中文</option>
+    <option value="ja">日本語</option>
+  </select>
+</header>
+
+<main>
+  <section class="top">
+    <h1 id="heading">NEBULA X AI 助手</h1>
+    <p id="subtitle">探索知识，创造无限可能。</p>
+  </section>
+
+  <section id="messages" aria-live="polite">
+    <div class="message bot" id="welcome">
+      你好！我是 NEBULA X AI。有什么可以帮你？
+    </div>
+  </section>
+
+  <div id="status"></div>
+
+  <form class="composer" id="form">
+    <textarea id="input" rows="1"
+      placeholder="输入你的问题……"
+      aria-label="输入消息"></textarea>
+    <button id="send" type="submit">发送</button>
+  </form>
+</main>
+
+<script>
+const messagesElement = document.getElementById("messages");
+const form = document.getElementById("form");
+const input = document.getElementById("input");
+const send = document.getElementById("send");
+const status = document.getElementById("status");
+const language = document.getElementById("language");
+
+let conversation = [];
+let busy = false;
+
+const words = {
+  zh: {
+    heading:"NEBULA X AI 助手",
+    subtitle:"探索知识，创造无限可能。",
+    welcome:"你好！我是 NEBULA X AI。有什么可以帮你？",
+    placeholder:"输入你的问题……",
+    send:"发送",
+    waiting:"AI 正在思考……",
+    error:"服务暂时不可用，请稍后重试。",
+    empty:"请先输入问题。"
+  },
+  ja: {
+    heading:"NEBULA X AI アシスタント",
+    subtitle:"知識を探求し、無限の可能性を創造。",
+    welcome:"こんにちは！NEBULA X AIです。何をお手伝いしましょうか？",
+    placeholder:"メッセージを入力……",
+    send:"送信",
+    waiting:"AIが考えています……",
+    error:"現在サービスを利用できません。後でもう一度お試しください。",
+    empty:"メッセージを入力してください。"
+  }
+};
+
+function addMessage(text, role) {
+  const bubble = document.createElement("div");
+  bubble.className = "message " + role;
+  bubble.textContent = text;
+  messagesElement.appendChild(bubble);
+  messagesElement.scrollTop = messagesElement.scrollHeight;
+  return bubble;
+}
+
+language.addEventListener("change", () => {
+  const w = words[language.value];
+  document.documentElement.lang = language.value === "ja" ? "ja" : "zh-CN";
+  document.getElementById("heading").textContent = w.heading;
+  document.getElementById("subtitle").textContent = w.subtitle;
+  document.getElementById("welcome").textContent = w.welcome;
+  input.placeholder = w.placeholder;
+  send.textContent = w.send;
+});
+
+form.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  const question = input.value.trim();
+  const w = words[language.value];
+
+  if (!question || busy) {
+    if (!question) status.textContent = w.empty;
+    return;
+  }
+
+  addMessage(question, "user");
+  conversation.push({role:"user", content:question});
+  input.value = "";
+  busy = true;
+  send.disabled = true;
+  status.textContent = w.waiting;
+
+  try {
+    const response = await fetch("/api/chat", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({messages:conversation})
+    });
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success || !data.reply) {
+      throw new Error(data.error || w.error);
+    }
+
+    addMessage(data.reply, "bot");
+    conversation.push({role:"assistant", content:data.reply});
+
+  } catch (error) {
+    addMessage(error.message || w.error, "bot");
+  } finally {
+    busy = false;
+    send.disabled = false;
+    status.textContent = "";
+    input.focus();
+  }
+});
+
+input.addEventListener("keydown", event => {
+  if (event.key === "Enter" && !event.shiftKey) {
+    event.preventDefault();
+    form.requestSubmit();
+  }
+});
+</script>
+</body>
+</html>
